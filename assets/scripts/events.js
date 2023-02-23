@@ -53,9 +53,18 @@ const boundFunction = buttonClickHandler.bind(this);
 
 // This will add two event listener to the button.
 // Add an event listener to the button.
-button.addEventListener('click', buttonClickHandler);
-button.addEventListener('click', boundFunction);
-button.addEventListener('click', buttonClickHandlerEventData);
+button.addEventListener('click', (e) => {
+    buttonClickHandler();
+    e.stopImmediatePropagation();
+});
+button.addEventListener('click', (e) => {
+    boundFunction();
+    e.stopImmediatePropagation();
+});
+button.addEventListener('click', (e) => {
+    buttonClickHandlerEventData();
+    e.stopImmediatePropagation();
+});
 
 setTimeout(() => {
     console.log('Removing event listener...');
@@ -69,3 +78,65 @@ setTimeout(() => {
 
     console.log('Event listener removed.');
 }, 5000);
+
+window.addEventListener('load', () => {
+    console.log('Window loaded.');
+});
+
+window.addEventListener('scroll', (e) => {
+    console.log('I have been scrolled.');
+});
+
+// Infinite scroll example.
+let curElementNumber = 0;
+
+function scrollHandler() {
+    const distanceToBottom = document.body.getBoundingClientRect().bottom;
+
+    if (distanceToBottom < document.documentElement.clientHeight + 150) {
+        const newDataElement = document.createElement('div');
+        curElementNumber++;
+        newDataElement.innerHTML = `<p>Element ${curElementNumber}</p>`;
+        document.body.append(newDataElement);
+    }
+}
+
+window.addEventListener('scroll', scrollHandler);
+
+const form = document.querySelector('form');
+form.addEventListener('submit', (event) => {
+    event.preventDefault();
+    console.log(event);
+});
+
+// Event propagation.
+const propagation = document.getElementById('propagation');
+const div = document.querySelector('div');
+
+// 
+div.addEventListener('click', (event) => {
+    console.log('Div clicked.');
+},
+    // If you want to switch the order of the event listeners, you can set the third parameter to true. This will make the event listener fire first.
+    //true
+);
+
+propagation.addEventListener('click', (event) => {
+    console.log('Propagation clicked.');
+
+    // This prevents the event from bubbling up the DOM tree. If it was not in place, the event would bubble up to the div and trigger the event listener on the div.
+    event.stopPropagation();
+
+    // Useful when you have multiple event listeners on the same element.
+    event.stopImmediatePropagation();
+});
+
+// Event delegation.
+const listItems = document.querySelectorAll('li');
+listItems.forEach(listItem => {
+    listItem.addEventListener('click', (event) => {
+        event.stopPropagation();
+        console.log(event.target);
+        event.target.classList.toggle('highlight');
+    });
+});
